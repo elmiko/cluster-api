@@ -23,6 +23,20 @@ import (
 // DockerMachineTemplateSpec defines the desired state of DockerMachineTemplate
 type DockerMachineTemplateSpec struct {
 	Template DockerMachineTemplateResource `json:"template"`
+
+	// AutoscalerHints contains information about the CPU, Memory, and GPU resources
+	// associated with Machines created from this temaplte. This information is used by
+	// the cluster autoscaler to perform scale from zero scheduling calculations.
+	// +optional
+	AutoscalerHints *AutoscalerResourceHints `json:"autoscalerHints,omitempty"`
+}
+
+// AutoscalerResourceHints contains resource information about CPU, Memory, and GPU
+// sizes associated with specific a machine template.
+type AutoscalerResourceHints struct {
+	vCPU   *string `json:"vCPU,omitempty"`
+	Memory *string `json:"memory,omitempty"`
+	GPU    *string `json:"gpu,omitempty"`
 }
 
 // +kubebuilder:object:root=true
