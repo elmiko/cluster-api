@@ -26,6 +26,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/labels"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/client-go/rest"
@@ -601,6 +602,32 @@ func (r *MachineSetReconciler) shouldAdopt(ms *clusterv1.MachineSet) bool {
 func (r *MachineSetReconciler) updateStatus(ctx context.Context, cluster *clusterv1.Cluster, ms *clusterv1.MachineSet, filteredMachines []*clusterv1.Machine) error {
 	log := ctrl.LoggerFrom(ctx)
 	newStatus := ms.Status.DeepCopy()
+
+	// Get the infrastructure ref resource so that we can look for the autoscaler resource hints
+	infra, err := external.Get(ctx, r.Client, &ms.Spec.Template.Spec.InfrastructureRef, cluster.Namespace)
+	if err != nil {
+		return err
+	}
+	if hints, found, err := unstructured.NestedStringMap(infra.Object, "spec", "autoscalerHints"); found {
+		newStatus.AutoscalerHints = &clusterv1.AutoscalerResourceHints{}
+		if val, found := hints["CPU"]; found {
+			newStatus.AutoscalerHints.CPU = &val
+			log.Info("found CPU")
+		} else {
+			log.Info("not found CPU")
+		}
+		if val, found := hints["memory"]; found {
+			newStatus.AutoscalerHints.Memory = &val
+			log.Info("found memory")
+		} else {
+			log.Info("not found memory")
+		}
+	} else {
+		if err != nil {
+			return err
+		}
+		log.V(4).Info("no resource hints found")
+	}
 
 	// Copy label selector to its status counterpart in string format.
 	// This is necessary for CRDs including scale subresources.
