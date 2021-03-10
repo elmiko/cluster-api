@@ -204,6 +204,14 @@ type MachineDeploymentStatus struct {
 	// Phase represents the current phase of a MachineDeployment (ScalingUp, ScalingDown, Running, Failed, or Unknown).
 	// +optional
 	Phase string `json:"phase,omitempty"`
+
+	// AutoscalerHints contains information about the CPU, Memory, and GPU resources
+	// associated with Machines created from this temaplte. This information is used by
+	// the cluster autoscaler to perform scale from zero scheduling calculations.
+	// These values are reconciled from the infrastructure template associated with this
+	// MachineDeployment.
+	// +optional
+	AutoscalerHints *AutoscalerResourceHints `json:"autoscalerHints,omitempty"`
 }
 
 // ANCHOR_END: MachineDeploymentStatus

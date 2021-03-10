@@ -95,6 +95,14 @@ const (
 	MachineNodeNameIndex = "status.nodeRef.name"
 )
 
+// AutoscalerResourceHints contains resource information about CPU, Memory, and GPU
+// sizes associated with specific a machine template.
+type AutoscalerResourceHints struct {
+	CPU    *string `json:"CPU,omitempty"`
+	Memory *string `json:"memory,omitempty"`
+	GPU    *string `json:"gpu,omitempty"`
+}
+
 // MachineAddress contains information for the node's address.
 type MachineAddress struct {
 	// Machine address type, one of Hostname, ExternalIP or InternalIP.

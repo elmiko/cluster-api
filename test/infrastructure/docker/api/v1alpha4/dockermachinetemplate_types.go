@@ -18,6 +18,7 @@ package v1alpha4
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	clusterv1 "sigs.k8s.io/cluster-api/api/v1alpha4"
 )
 
 // DockerMachineTemplateSpec defines the desired state of DockerMachineTemplate
@@ -28,15 +29,7 @@ type DockerMachineTemplateSpec struct {
 	// associated with Machines created from this temaplte. This information is used by
 	// the cluster autoscaler to perform scale from zero scheduling calculations.
 	// +optional
-	AutoscalerHints *AutoscalerResourceHints `json:"autoscalerHints,omitempty"`
-}
-
-// AutoscalerResourceHints contains resource information about CPU, Memory, and GPU
-// sizes associated with specific a machine template.
-type AutoscalerResourceHints struct {
-	vCPU   *string `json:"vCPU,omitempty"`
-	Memory *string `json:"memory,omitempty"`
-	GPU    *string `json:"gpu,omitempty"`
+	AutoscalerHints *clusterv1.AutoscalerResourceHints `json:"autoscalerHints,omitempty"`
 }
 
 // +kubebuilder:object:root=true
